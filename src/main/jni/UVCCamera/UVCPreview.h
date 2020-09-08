@@ -74,7 +74,6 @@ private:
 	int previewFormat;
 	size_t previewBytes;
 //
-	volatile bool mIsCapturing;
 	ANativeWindow *mCaptureWindow;
 	convFunc_t mFrameCallbackFunc;
 	int mPixelFormat;
