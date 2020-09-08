@@ -23,13 +23,6 @@
 
 package com.serenegiant.usb;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.text.TextUtils;
@@ -38,6 +31,13 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UVCCamera {
 	private static final boolean DEBUG = false;	// TODO set false when releasing
@@ -124,35 +124,6 @@ public class UVCCamera {
 			System.loadLibrary("UVCCamera");
 			isLoaded = true;
 		}
-	}
-
-	/**
-	 * Determine frame size in bytes for given parameters.
-	 *
-	 * @param width the width of the frame.
-	 * @param height the height of the frame.
-	 * @param pixelFormat the pixel format.
-	 * @return size of the frame in bytes.
-	 */
-	public static int getFrameSizeInBytes(int width, int height, int pixelFormat) {
-		int size = width * height;
-		switch (pixelFormat) {
-			case PIXEL_FORMAT_RAW:
-			case PIXEL_FORMAT_YUV:
-			case PIXEL_FORMAT_RGB565:
-				size *= 2;
-				break;
-			case PIXEL_FORMAT_RGBX:
-				size *= 4;
-				break;
-			case PIXEL_FORMAT_YUV420SP:
-			case PIXEL_FORMAT_NV21:
-			case PIXEL_FORMAT_YV12:
-			case PIXEL_FORMAT_I420:
-				size = (size * 3) / 2;
-				break;
-		}
-		return size;
 	}
 
 	private UsbControlBlock mCtrlBlock;
@@ -442,17 +413,6 @@ public class UVCCamera {
     	}
     }
 
-	/**
-	 * set frame callback
-	 * @param callback
-	 */
-	public void setRawFrameCallback(final IFrameCallback callback) {
-		if (mNativePtr != 0) {
-			nativeSetRawFrameCallback(mNativePtr, callback);
-		}
-	}
-
-	/**
     /**
      * start preview
      */
