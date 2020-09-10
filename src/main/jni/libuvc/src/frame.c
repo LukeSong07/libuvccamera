@@ -1090,11 +1090,11 @@ int uvc_yuyv2i420(uvc_frame_t *in, uvc_frame_t *out) {
 			*(y++) = yuv[4];	// y''
 			*(y++) = yuv[6];	// y'''
 			if ((h & 1) == 1) {
-				*(u++) = yuv[3];	// u
-				*(u++) = yuv[7];	// u
+				*(u++) = yuv[1];	// u
+				*(u++) = yuv[5];	// u
 			} else {
-				*(v++) = yuv[1];	// v
-				*(v++) = yuv[5];	// v
+				*(v++) = yuv[3];	// v
+				*(v++) = yuv[7];	// v
 			}
 			yuv += 8;	// (1pixel=2bytes)x4pixel=8bytes
 		}
@@ -1133,11 +1133,11 @@ int uvc_yuyv2yv12(uvc_frame_t *in, uvc_frame_t *out) {
 			*(y++) = yuv[4];	// y''
 			*(y++) = yuv[6];	// y'''
 			if ((h & 1) == 1) {
-				*(u++) = yuv[3];	// u
-				*(u++) = yuv[7];	// u
+				*(u++) = yuv[1];	// u
+				*(u++) = yuv[5];	// u
 			} else {
-				*(v++) = yuv[1];	// v
-				*(v++) = yuv[5];	// v
+				*(v++) = yuv[3];	// v
+				*(v++) = yuv[7];	// v
 			}
 			yuv += 8;	// (1pixel=2bytes)x4pixel=8bytes
 		}
