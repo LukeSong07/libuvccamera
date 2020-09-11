@@ -292,7 +292,22 @@ void UVCPreview::callbackPixelFormatChanged() {
         mFrameCallbackFunc = uvc_yuyv2i420;
         callbackPixelBytes = (sz * 3) / 2;
         break;
-	}
+      case PIXEL_FORMAT_RGB888:
+        LOGI("PIXEL_FORMAT_RGB888");
+        mFrameCallbackFunc = uvc_any2rgb;
+        callbackPixelBytes = sz * 3;
+        break;
+      case PIXEL_FORMAT_BGR888:
+        LOGI("PIXEL_FORMAT_BGR888");
+        mFrameCallbackFunc = uvc_any2bgr;
+        callbackPixelBytes = sz * 3;
+        break;
+      case PIXEL_FORMAT_ARGB:
+        LOGI("PIXEL_FORMAT_ARGB");
+        mFrameCallbackFunc = uvc_yuyv2xrgb;
+        callbackPixelBytes = sz * 4;
+        break;
+    }
 }
 
 void UVCPreview::clearDisplay() {

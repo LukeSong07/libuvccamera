@@ -62,6 +62,9 @@ public class UVCCamera {
 	public static final int PIXEL_FORMAT_NV21 = 5;		// YVU420SemiPlanar
 	public static final int PIXEL_FORMAT_YV12 = 6; 		// YUV420 Planar
 	public static final int PIXEL_FORMAT_I420 = 7;
+	public static final int PIXEL_FORMAT_RGB888 = 8;
+	public static final int PIXEL_FORMAT_BGR888 = 9;
+	public static final int PIXEL_FORMAT_ARGB = 10;
 
 	//--------------------------------------------------------------------------------
     public static final int	CTRL_SCANNING		= 0x00000001;	// D0:  Scanning Mode

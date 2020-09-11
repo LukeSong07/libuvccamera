@@ -631,6 +631,97 @@ uvc_error_t uvc_yuyv2rgbx(uvc_frame_t *in, uvc_frame_t *out) {
 	return UVC_SUCCESS;
 }
 
+#define IYUYV2XRGB_2(pyuv, prgbx, ax, bx) { \
+		const int d1 = (pyuv)[ax+1]; \
+		const int d3 = (pyuv)[ax+3]; \
+		const int r = (22987 * (d3/*(pyuv)[ax+3]*/ - 128)) >> 14; \
+		const int g = (-5636 * (d1/*(pyuv)[ax+1]*/ - 128) - 11698 * (d3/*(pyuv)[ax+3]*/ - 128)) >> 14; \
+		const int b = (29049 * (d1/*(pyuv)[ax+1]*/ - 128)) >> 14; \
+		const int y0 = (pyuv)[ax+0]; \
+		(prgbx)[bx+0] = 0xff; \
+		(prgbx)[bx+1] = sat(y0 + r); \
+		(prgbx)[bx+2] = sat(y0 + g); \
+		(prgbx)[bx+3] = sat(y0 + b); \
+		const int y2 = (pyuv)[ax+2]; \
+		(prgbx)[bx+4] = 0xff; \
+		(prgbx)[bx+5] = sat(y2 + r); \
+		(prgbx)[bx+6] = sat(y2 + g); \
+		(prgbx)[bx+7] = sat(y2 + b); \
+    }
+#define IYUYV2XRGB_16(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_8(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_8(pyuv, prgbx, ax + PIXEL8_YUYV, bx + PIXEL8_RGBX);
+#define IYUYV2XRGB_8(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_4(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_4(pyuv, prgbx, ax + PIXEL4_YUYV, bx + PIXEL4_RGBX);
+#define IYUYV2XRGB_4(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_2(pyuv, prgbx, ax, bx) \
+	IYUYV2XRGB_2(pyuv, prgbx, ax + PIXEL2_YUYV, bx + PIXEL2_RGBX);
+
+/** @brief Convert a frame from YUYV to XRGB8888
+ * @ingroup frame
+ * @param ini YUYV frame
+ * @param out XRGB8888 frame
+ */
+uvc_error_t uvc_yuyv2xrgb(uvc_frame_t *in, uvc_frame_t *out) {
+	if (UNLIKELY(in->frame_format != UVC_FRAME_FORMAT_YUYV))
+		return UVC_ERROR_INVALID_PARAM;
+
+	if (UNLIKELY(uvc_ensure_frame_size(out, in->width * in->height * PIXEL_RGBX) < 0))
+		return UVC_ERROR_NO_MEM;
+
+	out->width = in->width;
+	out->height = in->height;
+	out->frame_format = UVC_FRAME_FORMAT_RGBX;
+	if (out->library_owns_data)
+		out->step = in->width * PIXEL_RGBX;
+	out->sequence = in->sequence;
+	out->capture_time = in->capture_time;
+	out->source = in->source;
+
+	uint8_t *pyuv = in->data;
+	const uint8_t *pyuv_end = pyuv + in->data_bytes - PIXEL8_YUYV;
+	uint8_t *prgbx = out->data;
+	const uint8_t *prgbx_end = prgbx + out->data_bytes - PIXEL8_RGBX;
+
+	// YUYV => XRGB8888
+#if USE_STRIDE
+	if (in->step && out->step && (in->step != out->step)) {
+		const int hh = in->height < out->height ? in->height : out->height;
+		const int ww = in->width < out->width ? in->width : out->width;
+		int h, w;
+		for (h = 0; h < hh; h++) {
+			w = 0;
+			pyuv = in->data + in->step * h;
+			prgbx = out->data + out->step * h;
+			for (; (prgbx <= prgbx_end) && (pyuv <= pyuv_end) && (w < ww) ;) {
+				IYUYV2XRGB_8(pyuv, prgbx, 0, 0);
+
+				prgbx += PIXEL8_RGBX;
+				pyuv += PIXEL8_YUYV;
+				w += 8;
+			}
+		}
+	} else {
+		// compressed format? XXX if only one of the frame in / out has step, this may lead to crash...
+		for (; (prgbx <= prgbx_end) && (pyuv <= pyuv_end) ;) {
+			IYUYV2XRGB_8(pyuv, prgbx, 0, 0);
+
+			prgbx += PIXEL8_RGBX;
+			pyuv += PIXEL8_YUYV;
+		}
+	}
+#else
+	for (; (prgbx <= prgbx_end) && (pyuv <= pyuv_end) ;) {
+		IYUYV2XRGB_8(pyuv, prgbx, 0, 0);
+
+		prgbx += PIXEL8_RGBX;
+		pyuv += PIXEL8_YUYV;
+	}
+#endif
+	return UVC_SUCCESS;
+}
+
 #define IYUYV2BGR_2(pyuv, pbgr, ax, bx) { \
 		const int d1 = (pyuv)[1]; \
 		const int d3 = (pyuv)[3]; \
