@@ -191,7 +191,7 @@ public class UVCCamera {
      * USB permission is necessary before this method is called
      * @param ctrlBlock
      */
-    public synchronized void open(final UsbControlBlock ctrlBlock) {
+    public synchronized int open(final UsbControlBlock ctrlBlock) {
     	int result;
     	try {
 			mCtrlBlock = ctrlBlock.clone();
@@ -206,13 +206,16 @@ public class UVCCamera {
 			result = -1;
 		}
 		if (result != 0) {
-			throw new UnsupportedOperationException("open failed:result=" + result);
+			Log.e(TAG, "open failed:result=" + result);
+			return result;
+			// throw new UnsupportedOperationException("open failed:result=" + result);
 		}
     	if (mNativePtr != 0 && TextUtils.isEmpty(mSupportedSize)) {
     		mSupportedSize = nativeGetSupportedSize(mNativePtr);
     	}
 		nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
 			DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);
+    	return result;
     }
 
 	/**
