@@ -385,7 +385,9 @@ public final class USBMonitor {
 	 * @throws IllegalStateException
 	 */
 	public final boolean hasPermission(final UsbDevice device) throws IllegalStateException {
-		if (destroyed) throw new IllegalStateException("already destroyed");
+		if (destroyed)
+			return false;
+//			throw new IllegalStateException("already destroyed");
 		return updatePermission(device, device != null && mUsbManager.hasPermission(device));
 	}
 

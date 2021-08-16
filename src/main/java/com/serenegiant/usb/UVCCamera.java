@@ -422,10 +422,12 @@ public class UVCCamera {
     /**
      * start preview
      */
-    public synchronized void startPreview() {
+    public synchronized int startPreview() {
+    	int ret = -1;
     	if (mCtrlBlock != null) {
-    		nativeStartPreview(mNativePtr);
+    		ret = nativeStartPreview(mNativePtr);
     	}
+    	return ret;
     }
 
     /**
